@@ -1,0 +1,12 @@
+{
+  "soyskill.soycheese_core.enchanted_golden_apple.lock": "未食用过附魔金苹果",
+  "soyskill.soycheese_core.enchanted_golden_apple.unlock_0": "你感觉到你的额外抗",
+  "soyskill.soycheese_core.enchanted_golden_apple.unlock_1": "性得到缓慢提升",
+  "gui.soycheese_core.cookbook.kindbutton_0": "前菜",
+  "gui.soycheese_core.cookbook.kindbutton_1": "主菜",
+  "gui.soycheese_core.cookbook.kindbutton_2": "甜品",
+  "gui.soycheese_core.cookbook.kindbutton_3": "酒水",
+  "gui.soycheese_core.cookbook.notext_button": "",
+  "gui.soycheese_core.cookbook.equip": "装备",
+  "gui.soycheese_core.cookbook.unequip": "卸下"
+}
