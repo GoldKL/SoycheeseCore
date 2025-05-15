@@ -163,12 +163,6 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                 }
             }
         });
-        /*
-        if(gx>=this.leftPos+169&&gx<=this.leftPos+184&&gy>=this.topPos+153&&gy<=this.topPos+168)
-            guiGraphics.blit(texture, this.leftPos+169, this.topPos+153, screenVar.now_read_mode * 16, 240, 16, 16, 256, 256);
-        else
-            guiGraphics.blit(texture, this.leftPos+169, this.topPos+153, screenVar.now_read_mode * 16, 224, 16, 16, 256, 256);
-       */
         //左翻页按钮
         if(screenVar.now_page > 0)
             if(gx>=this.leftPos+138&&gx<=this.leftPos+151&&gy>=this.topPos+197&&gy<=this.topPos+203)
@@ -216,6 +210,22 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                     guiGraphics.blit(element_texture, this.leftPos+139+i*27, this.topPos+209, 23, 44, 23, 44, 256, 256);
                 } else {
                     guiGraphics.blit(element_texture, this.leftPos+139+i*27, this.topPos+209, 23, 132, 23, 44, 256, 256);
+                }
+            }
+        }
+        //装备按钮
+        if(screenVar.now_skill != null) {
+            BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+            if (bsk != null) {
+                if(!bsk.getIslock(entity)) {
+                    if(gx >= this.leftPos + 25 && gy >= this.topPos+175 && gx <= this.leftPos + 97 && gy <= this.topPos+197)
+                    {
+                        guiGraphics.blit(element_texture, this.leftPos+24, this.topPos+174, 88, 64, 75, 18, 256, 256);
+                    }
+                    else
+                    {
+                        guiGraphics.blit(element_texture, this.leftPos+24, this.topPos+174, 88, 46, 75, 18, 256, 256);
+                    }
                 }
             }
         }
@@ -283,13 +293,17 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                 //guiGraphics.pose().popPose();
                 guiGraphics.disableScissor();
                 if(!bsk.getIslock(entity)) {
+                    float a = 1.5f;
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().scale(a, a, 1.0f); // 1.5 倍大小
                     entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
                         if (list.containsSkill(bsk)) {
-                            guiGraphics.drawString(this.font, Component.translatable("gui.soycheese_core.cookbook.unequip"), 58, 176, 0xFFFFFFFF, false);
+                            guiGraphics.drawString(this.font, Component.translatable("gui.soycheese_core.cookbook.unequip"), (int)((25+37-a*this.font.width(Component.translatable("gui.soycheese_core.cookbook.unequip").getVisualOrderText()) / 2.0)/a), (int)(177/a), 0xFFFFFFFF, false);
                         } else {
-                            guiGraphics.drawString(this.font, Component.translatable("gui.soycheese_core.cookbook.equip"), 58, 176, 0xFFFFFFFF, false);
+                            guiGraphics.drawString(this.font, Component.translatable("gui.soycheese_core.cookbook.equip"), (int)((25+37-a*this.font.width(Component.translatable("gui.soycheese_core.cookbook.equip").getVisualOrderText()) / 2.0)/a), (int)(177/a), 0xFFFFFFFF, false);
                         }
                     });
+                    guiGraphics.pose().popPose();
                 }
             }
         }
@@ -496,13 +510,13 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                     });
                 }
             }
-        }).bounds(this.leftPos + 26, this.topPos + 173, 80, 15).build(builder -> new Button(builder) {
+        }).bounds(this.leftPos + 25, this.topPos + 175, 73, 16).build(builder -> new Button(builder) {
             @Override
             public void render(GuiGraphics guiGraphics, int gx, int gy, float ticks) {
-                BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                /*BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
                 if(bsk != null)
                     if(!bsk.getIslock(entity))
-                        super.render(guiGraphics, gx, gy, ticks);
+                        super.render(guiGraphics, gx, gy, ticks);*/
             }
         });
         guistate.put("button:equip_unequip_skills_buttons", equip_unequip_skills_buttons);
