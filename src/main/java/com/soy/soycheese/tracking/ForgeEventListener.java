@@ -5,8 +5,9 @@ import com.soy.soycheese.capability.foodlist.PlayerFoodList;
 import com.soy.soycheese.capability.foodlist.PlayerFoodListProvider;
 import com.soy.soycheese.capability.skilllist.PlayerSkillList;
 import com.soy.soycheese.capability.skilllist.PlayerSkillListProvider;
-import com.soy.soycheese.communication.PlayerFoodListMessage;
-import com.soy.soycheese.communication.PlayerSkillListMessage;
+import com.soy.soycheese.network.SoycheesePacket;
+import com.soy.soycheese.network.communication.PlayerFoodListMessage;
+import com.soy.soycheese.network.communication.PlayerSkillListMessage;
 import com.soy.soycheese.registries.SkillRegistry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -68,19 +69,17 @@ public class ForgeEventListener {
     public static void syncPlayerFoodList(Player player) {
         if (player.level().isClientSide) return;
         var target = (ServerPlayer) player;
-        SoycheeseCore.channel.sendTo(
+        SoycheesePacket.sendToClient(
                 new PlayerFoodListMessage(target.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).orElse(new PlayerFoodList())),
-                target.connection.connection,
-                NetworkDirection.PLAY_TO_CLIENT
+                target
         );
     }
     public static void syncPlayerSkillList(Player player) {
         if (player.level().isClientSide) return;
         var target = (ServerPlayer) player;
-        SoycheeseCore.channel.sendTo(
+        SoycheesePacket.sendToClient(
                 new PlayerSkillListMessage(target.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(new PlayerSkillList())),
-                target.connection.connection,
-                NetworkDirection.PLAY_TO_CLIENT
+                target
         );
     }
 }

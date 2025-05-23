@@ -1,8 +1,7 @@
-package com.soy.soycheese.communication;
+package com.soy.soycheese.network.communication;
 
-import com.soy.soycheese.SoycheeseCore;
-import com.soy.soycheese.capability.skilllist.PlayerSkillList;
-import com.soy.soycheese.capability.skilllist.PlayerSkillListProvider;
+import com.soy.soycheese.capability.foodlist.PlayerFoodList;
+import com.soy.soycheese.capability.foodlist.PlayerFoodListProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -10,19 +9,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
-
 import java.util.function.Supplier;
 
-public class PlayerSkillListMessage {
+public class PlayerFoodListMessage {
     private CompoundTag capabilityNBT;
 
-    public PlayerSkillListMessage(PlayerSkillList skillList) {
+    public PlayerFoodListMessage(PlayerFoodList foodList) {
         var tag = new CompoundTag();
-        skillList.saveNBTData(tag);
+        foodList.saveNBTData(tag);
         this.capabilityNBT = tag;
     }
 
-    public PlayerSkillListMessage(FriendlyByteBuf buffer) {
+    public PlayerFoodListMessage(FriendlyByteBuf buffer) {
         this.capabilityNBT = buffer.readNbt();
     }
 
@@ -35,12 +33,12 @@ public class PlayerSkillListMessage {
     }
 
     private static class Handler {
-        static void handle(PlayerSkillListMessage message, Supplier<NetworkEvent.Context> context) {
+        static void handle(PlayerFoodListMessage message, Supplier<NetworkEvent.Context> context) {
             context.get().enqueueWork(() -> {
                 Player player = Minecraft.getInstance().player;
                 assert player != null;
 
-                player.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
+                player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).ifPresent(list -> {
                     list.loadNBTData(message.capabilityNBT);
                 });
             });

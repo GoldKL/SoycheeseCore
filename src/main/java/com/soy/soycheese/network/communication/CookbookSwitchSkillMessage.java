@@ -1,4 +1,4 @@
-package com.soy.soycheese.communication;
+package com.soy.soycheese.network.communication;
 
 import com.soy.soycheese.capability.skilllist.PlayerSkillListProvider;
 import com.soy.soycheese.inventory.CookbookMenu;
@@ -14,8 +14,6 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.function.Supplier;
-
-import static com.soy.soycheese.tracking.ForgeEventListener.syncPlayerSkillList;
 
 public class CookbookSwitchSkillMessage {
     private final int buttonID, x, y, z;

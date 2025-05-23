@@ -7,5 +7,17 @@
   "gui.soycheese_core.cookbook.kindbutton_3": "酒水",
   "gui.soycheese_core.cookbook.notext_button": "",
   "gui.soycheese_core.cookbook.equip": "装备",
-  "gui.soycheese_core.cookbook.unequip": "卸下"
+  "gui.soycheese_core.cookbook.unequip": "卸下",
+
+
+
+  "soycheese_core.screen.title": "教程",
+  "soycheese_core.screen.title_0": "%s / %s",
+  "soycheese_core.screen.title_1": "全部",
+  "soycheese_core.screen.title_2": "分类1",
+  "soycheese_core.screen.title_3": "分类2",
+  "soycheese_core.screen.title_4": "分类3",
+  "soycheese_core.button.claim": "领取",
+  "soycheese_core.tips.crafting_table": "工作台",
+  "soycheese_core.tips.crafting_table_1": "工作台制作"
 }
