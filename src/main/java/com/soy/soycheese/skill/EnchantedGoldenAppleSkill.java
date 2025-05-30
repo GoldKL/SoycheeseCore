@@ -1,5 +1,6 @@
 package com.soy.soycheese.skill;
 
+import com.soy.soycheese.SoycheeseCore;
 import com.soy.soycheese.capability.foodlist.PlayerFoodListProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +22,8 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
         return locked.get();
     }
     public void onTick(Player player) {
-        int cooltime = player.getPersistentData().getInt("soycheese_EGapple_cooltime");
+        if(player.level().isClientSide)return;
+        int cooltime = player.getPersistentData().getInt("soycheesecore:EGapple_cooltime");
         cooltime += 1;
         if (cooltime >= 50)  {
             cooltime = 0;
@@ -30,6 +32,6 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
                 player.setAbsorptionAmount(Math.min(20,player.getAbsorptionAmount() + (float)(1)));
             }
         }
-        player.getPersistentData().putInt("soycheese_EGapple_cooltime", cooltime);
+        player.getPersistentData().putInt("soycheesecore:EGapple_cooltime", cooltime);
     }
 }
