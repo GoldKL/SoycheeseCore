@@ -23,6 +23,7 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
     }
     public void onTick(Player player) {
         if(player.level().isClientSide)return;
+        //player.tickCount也可以记录时间，考虑以后修改相应逻辑
         int cooltime = player.getPersistentData().getInt("soycheesecore:EGapple_cooltime");
         cooltime += 1;
         if (cooltime >= 50)  {
