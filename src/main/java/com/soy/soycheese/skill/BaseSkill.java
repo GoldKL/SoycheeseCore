@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import com.soy.soycheese.registries.SkillRegistry;
 
-public class BaseSkill {
+public abstract class BaseSkill {
     @Nullable
     private String nameid;
-    private final int type;
+    private final int type;//0 1 2 3 分类
     public BaseSkill(int type) {
         this.type = type;
     }
@@ -43,12 +43,15 @@ public class BaseSkill {
         return new ResourceLocation(SoycheeseCore.MODID, "textures/gui/skill_icons/" + this.getOrCreateNameid() + ".png");
     }
     public void onTick(Player player) {
-
+        //该效果每玩家刻执行
     }
     public void onEquip(Player player) {
-
+        //此时技能已被装备
     }
     public void onUnequip(Player player) {
-
+        //此时技能已被卸下
+    }
+    public void onChangeOtherEquip(Player player,@Nullable BaseSkill newskill,@Nullable BaseSkill oldskill) {
+        //当其他的技能改变时，此时新技能已被装备，旧技能已被卸载
     }
 }

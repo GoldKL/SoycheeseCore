@@ -132,8 +132,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
             }
         }
         //输出右边技能图鉴
-        for(int i = 0; i < 28 ; ++i)
-        {
+        for(int i = 0; i < 28 ; ++i) {
             int num = screenVar.now_page * 28 + i;
             if(num >= skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size())break;
             BaseSkill bsk = SkillRegistry.getSkill(skills.get(screenVar.now_kind).get(screenVar.now_read_mode).get(num));
@@ -170,7 +169,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
             else
                 guiGraphics.blit(element_texture, this.leftPos+138, this.topPos+197, 46, 66, 14, 7, 256, 256);
         //右翻页按钮
-        if(screenVar.now_page + 1 < skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size() / 24 + (skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size() % 24 == 0 ? 0 : 1))
+        if(screenVar.now_page + 1 < skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size() / 28 + (skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size() % 28 == 0 ? 0 : 1))
             if(gx>=this.leftPos+199&&gx<=this.leftPos+222&&gy>=this.topPos+153&&gy<=this.topPos+167)
                 guiGraphics.blit(element_texture, this.leftPos+199, this.topPos+153, 66, 44, 14, 7, 256, 256);
             else
@@ -237,6 +236,17 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         if (key == 256) {
             this.minecraft.player.closeContainer();
             return true;
+        }
+        if(screenVar.skill_des_length > view_length)
+        {
+            if(key == 264)
+            {
+                screenVar.fix_des = Math.min(screenVar.fix_des + 6,screenVar.skill_des_length - view_length);
+            }
+            else if(key == 265)
+            {
+                screenVar.fix_des = Math.max(screenVar.fix_des - 6,0);
+            }
         }
         return super.keyPressed(key, b, c);
     }
@@ -359,6 +369,23 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                 @Override
                 public void render(GuiGraphics guiGraphics, int gx, int gy, float ticks) {
                 }
+                @Override
+                public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
+                {
+                    int num = screenVar.now_page * 28 + index;
+                    if(num < skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size())
+                        return super.keyPressed(p_93374_, p_93375_, p_93376_);
+                    return false;
+                }
+                @Override
+                protected boolean clicked(double p_93681_, double p_93682_)
+                {
+                    int num = screenVar.now_page * 28 + index;
+                    boolean ret = super.clicked(p_93681_, p_93682_);
+                    if(ret)
+                        return num < skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size();
+                    return false;
+                }
             });
             skills_buttons.add(Frame);
             guistate.put("button:button_"+Integer.toString(index), Frame);
@@ -369,13 +396,15 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         {
             int index = i;
             Button Frame = Button.builder(Component.translatable("gui.soycheese_core.cookbook.notext_button"), e -> {
-                final Boolean[] can_click = {false};
-                entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
-                    ResourceLocation resourceLocation = list.getSkilllist().get(index);
-                    if (!(resourceLocation == null||resourceLocation.equals(PlayerSkillList.noneSkill)))
-                        can_click[0] = true;
-                });
-                if(can_click[0])
+                boolean can_click = false;
+                PlayerSkillList plist = entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+                if(plist != null)
+                {
+                    ResourceLocation presourceLocation = plist.getSkilllist().get(index);
+                    if (!(presourceLocation == null||presourceLocation.equals(PlayerSkillList.noneSkill)))
+                        can_click = true;
+                }
+                if(can_click)
                 {
                     if(hasShiftDown()) {
                         entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
@@ -408,6 +437,39 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
             }).bounds(this.leftPos + 24 + i * 22, this.topPos + 30, 20, 20).build(builder -> new Button(builder) {
                 @Override
                 public void render(GuiGraphics guiGraphics, int gx, int gy, float ticks) {
+                }
+                @Override
+                public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
+                {
+                    boolean can_click = false;
+                    PlayerSkillList plist = entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+                    if(plist != null)
+                    {
+                        ResourceLocation presourceLocation = plist.getSkilllist().get(index);
+                        if (!(presourceLocation == null||presourceLocation.equals(PlayerSkillList.noneSkill)))
+                            can_click = true;
+                    }
+                    if(can_click)
+                        return super.keyPressed(p_93374_, p_93375_, p_93376_);
+                    return false;
+                }
+                @Override
+                protected boolean clicked(double p_93681_, double p_93682_)
+                {
+                    boolean ret = super.clicked(p_93681_, p_93682_);
+                    if(ret)
+                    {
+                        boolean can_click = false;
+                        PlayerSkillList plist = entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+                        if(plist != null)
+                        {
+                            ResourceLocation presourceLocation = plist.getSkilllist().get(index);
+                            if (!(presourceLocation == null||presourceLocation.equals(PlayerSkillList.noneSkill)))
+                                can_click = true;
+                        }
+                        return can_click;
+                    }
+                    return false;
                 }
             });
             skills_buttons.add(Frame);
@@ -475,13 +537,28 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
             @Override
             public void render(GuiGraphics guiGraphics, int gx, int gy, float ticks) {
             }
+            @Override
+            public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
+            {
+                if(screenVar.now_page > 0)
+                    return super.keyPressed(p_93374_, p_93375_, p_93376_);
+                return false;
+            }
+            @Override
+            protected boolean clicked(double p_93681_, double p_93682_)
+            {
+                boolean ret = super.clicked(p_93681_, p_93682_);
+                if(ret)
+                    return screenVar.now_page > 0;
+                return false;
+            }
         });
         guistate.put("button:pre_page", pre_page);
         this.addRenderableWidget(pre_page);
         //右翻页
         next_page = Button.builder(Component.translatable("gui.soycheese_core.cookbook.notext_button"), e -> {
             int temp_num = skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size();
-            if(screenVar.now_page + 1 < temp_num / 24 + (temp_num % 24 == 0 ? 0 : 1))
+            if(screenVar.now_page + 1 < temp_num / 28 + (temp_num % 28 == 0 ? 0 : 1))
             {
                 screenVar.now_page += 1;
                 screenVar.choose_skill = -1;
@@ -489,6 +566,25 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         }).bounds(this.leftPos + 228, this.topPos + 197, 14, 7).build(builder -> new Button(builder) {
             @Override
             public void render(GuiGraphics guiGraphics, int gx, int gy, float ticks) {
+            }
+            @Override
+            public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
+            {
+                int temp_num = skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size();
+                if(screenVar.now_page + 1 < temp_num / 28 + (temp_num % 28 == 0 ? 0 : 1))
+                    return super.keyPressed(p_93374_, p_93375_, p_93376_);
+                return false;
+            }
+            @Override
+            protected boolean clicked(double p_93681_, double p_93682_)
+            {
+                boolean ret = super.clicked(p_93681_, p_93682_);
+                if(ret)
+                {
+                    int temp_num = skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size();
+                    return screenVar.now_page + 1 < temp_num / 28 + (temp_num % 28 == 0 ? 0 : 1);
+                }
+                return false;
             }
         });
         guistate.put("button:next_page", next_page);
@@ -513,10 +609,30 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         }).bounds(this.leftPos + 25, this.topPos + 175, 73, 16).build(builder -> new Button(builder) {
             @Override
             public void render(GuiGraphics guiGraphics, int gx, int gy, float ticks) {
-                /*BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
-                if(bsk != null)
-                    if(!bsk.getIslock(entity))
-                        super.render(guiGraphics, gx, gy, ticks);*/
+            }
+            @Override
+            public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
+            {
+                BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                if(bsk != null) {
+                    if (!bsk.getIslock(entity)){
+                        return super.keyPressed(p_93374_, p_93375_, p_93376_);
+                    }
+                }
+                return false;
+            }
+            @Override
+            protected boolean clicked(double p_93681_, double p_93682_)
+            {
+                boolean ret = super.clicked(p_93681_, p_93682_);
+                if(ret)
+                {
+                    BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                    if(bsk != null) {
+                        return !bsk.getIslock(entity);
+                    }
+                }
+                return false;
             }
         });
         guistate.put("button:equip_unequip_skills_buttons", equip_unequip_skills_buttons);
@@ -570,6 +686,19 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                         screenVar.fix_des = (int)(((float)nup)*((float)screenVar.skill_des_length)/slider_length);
                     }
                 }
+            }
+            @Override
+            public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
+            {
+                return false;
+            }
+            @Override
+            protected boolean clicked(double p_93681_, double p_93682_)
+            {
+                boolean ret = super.clicked(p_93681_, p_93682_);
+                if(ret)
+                    return screenVar.skill_des_length > view_length;
+                return false;
             }
         });
         guistate.put("button:slider", slider);

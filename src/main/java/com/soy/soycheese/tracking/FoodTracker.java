@@ -43,27 +43,16 @@ import net.minecraftforge.network.NetworkHooks;
 public class FoodTracker {
     @SubscribeEvent
     public static void onFoodEaten(LivingEntityUseItemEvent.Finish event) {
-        //ItemTooltipEvent 用来修改鼠标放上去的显示，只用于客户端
         if (!(event.getEntity() instanceof Player player)) return;
         if(!player.isAlive())return;
-        if(player.level().isClientSide)
-        {
-            /*player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).ifPresent(list -> {
-                list.getFoodlist().stream()
-                        .forEach(x -> {
-                            SoycheeseCore.LOGGER.info(x.toString());
-                        });
-            });*/
-            //SoycheeseCore.LOGGER.info(SkillRegistry.SKILL_REGISTRY_KEY.toString());
-            return;
-        }
+        if(player.level().isClientSide) return;
         ItemStack usedItem = event.getItem();
         if (!usedItem.isEdible()) return;
         player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).ifPresent(list -> {
             list.addFood(usedItem.getItem());
         });
         ForgeEventListener.syncPlayerFoodList(player);
-
+    /*打开天赋系统*/
         if (player instanceof ServerPlayer _ent) {
             BlockPos _bpos = BlockPos.containing(_ent.getX(), _ent.getY(), _ent.getZ());
             NetworkHooks.openScreen((ServerPlayer) _ent, new MenuProvider() {
@@ -78,6 +67,7 @@ public class FoodTracker {
                 }
             }, _bpos);
         }
-
+    /**/
     }
+    //ItemTooltipEvent 用来修改鼠标放上去的显示，只用于客户端
 }

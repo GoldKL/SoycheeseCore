@@ -82,6 +82,14 @@ public class CookbookSwitchSkillMessage {
                         }
                         list.setSkill(bsk,bsk.getType());
                         bsk.onEquip(entity);
+                        for(int i = 0; i < 4 ;++i)
+                        {
+                            if(i == bsk.getType())continue;
+                            BaseSkill other_bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
+                            if (other_bsk != null) {
+                                other_bsk.onChangeOtherEquip(entity,bsk,old_bsk);
+                            }
+                        }
                     });
                 }
                 else
@@ -89,6 +97,14 @@ public class CookbookSwitchSkillMessage {
                     entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
                         list.removeSkill(bsk);
                         bsk.onUnequip(entity);
+                        for(int i = 0; i < 4 ;++i)
+                        {
+                            if(i == bsk.getType())continue;
+                            BaseSkill other_bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
+                            if (other_bsk != null) {
+                                other_bsk.onChangeOtherEquip(entity,null,bsk);
+                            }
+                        }
                     });
                 }
                 ForgeEventListener.syncPlayerSkillList(entity);
