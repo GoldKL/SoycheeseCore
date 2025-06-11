@@ -35,6 +35,9 @@ public class PlayerFoodList {
     public boolean containsFood(Item food) {
         return this.foodlist.contains(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(food));
     }
+    public boolean containsFood(ResourceLocation food) {
+        return this.foodlist.contains(food);
+    }
     public int getFoodCount() {
         return this.foodlist.size();
     }

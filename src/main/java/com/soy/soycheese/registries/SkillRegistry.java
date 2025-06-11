@@ -23,7 +23,7 @@ public class SkillRegistry {
     private static final DeferredRegister<BaseSkill> SKILLS = DeferredRegister.create(SKILL_REGISTRY_KEY, SoycheeseCore.MODID);
     public static final Supplier<IForgeRegistry<BaseSkill>> REGISTRY = SKILLS.makeRegistry(() -> new RegistryBuilder<BaseSkill>().disableSaving().disableOverrides());
 
-    public static final RegistryObject<BaseSkill> ENCHANTEDGOLDENAPPLE = SKILLS.register("enchanted_golden_apple", EnchantedGoldenAppleSkill::new);
+    public static final RegistryObject<EnchantedGoldenAppleSkill> ENCHANTEDGOLDENAPPLE = SKILLS.register("enchanted_golden_apple", EnchantedGoldenAppleSkill::new);
     public static void register(IEventBus eventBus) {
         SKILLS.register(eventBus);
     }

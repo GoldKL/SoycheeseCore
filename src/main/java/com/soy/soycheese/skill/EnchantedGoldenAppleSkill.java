@@ -1,38 +1,29 @@
 package com.soy.soycheese.skill;
 
-import com.soy.soycheese.SoycheeseCore;
+import com.soy.soycheese.capability.foodlist.PlayerFoodList;
 import com.soy.soycheese.capability.foodlist.PlayerFoodListProvider;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.world.item.Items;
 
 public class EnchantedGoldenAppleSkill extends BaseSkill {
     public EnchantedGoldenAppleSkill() {
         super(0);
     }
     public boolean getIslock(Player player) {
-        AtomicBoolean locked = new AtomicBoolean(false);
-        player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).ifPresent(list -> {
-            locked.set(!list.getFoodlist().contains(new ResourceLocation("minecraft:enchanted_golden_apple")));
-        });
-        return locked.get();
+        PlayerFoodList playerFoodList = player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).orElse(null);
+        if (playerFoodList != null) {
+            return !playerFoodList.containsFood(Items.ENCHANTED_GOLDEN_APPLE);
+        }
+        return false;
     }
     public void onTick(Player player) {
         if(player.level().isClientSide)return;
-        //player.tickCount也可以记录时间，考虑以后修改相应逻辑
-        int cooltime = player.getPersistentData().getInt("soycheesecore:EGapple_cooltime");
-        cooltime += 1;
-        if (cooltime >= 50)  {
-            cooltime = 0;
+        if(player.tickCount % 50 == 0)
+        {
             if(player.getAbsorptionAmount() < 20)
             {
                 player.setAbsorptionAmount(Math.min(20,player.getAbsorptionAmount() + (float)(1)));
             }
         }
-        player.getPersistentData().putInt("soycheesecore:EGapple_cooltime", cooltime);
     }
 }
