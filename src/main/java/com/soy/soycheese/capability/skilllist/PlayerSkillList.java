@@ -1,21 +1,16 @@
 package com.soy.soycheese.capability.skilllist;
 
 import com.soy.soycheese.SoycheeseCore;
-import com.soy.soycheese.skill.BaseSkill;
+import com.soy.soycheese.skill.AbstractSkill;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.TropicalFish;
-import net.minecraft.world.item.Item;
 import com.soy.soycheese.registries.SkillRegistry;
-import net.minecraftforge.registries.IForgeRegistry;
 
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Objects;
 
 public class PlayerSkillList {
@@ -36,7 +31,7 @@ public class PlayerSkillList {
         this.skilllist.clear();
         this.skilllist.addAll(Arrays.asList(noneSkill,noneSkill,noneSkill,noneSkill));
     }
-    public void setSkill(BaseSkill skill,int slot) {
+    public void setSkill(AbstractSkill skill, int slot) {
         this.skilllist.set(slot,SkillRegistry.REGISTRY.get().getKey(skill));
     }
     public void removeSkill(int slot) {
@@ -47,12 +42,12 @@ public class PlayerSkillList {
         if(slot == -1) return;
         removeSkill(slot);
     }
-    public void removeSkill(BaseSkill skill) {
+    public void removeSkill(AbstractSkill skill) {
         int slot = this.skilllist.indexOf(SkillRegistry.REGISTRY.get().getKey(skill));
         if(slot == -1) return;
         removeSkill(slot);
     }
-    public boolean containsSkill(BaseSkill skill) {
+    public boolean containsSkill(AbstractSkill skill) {
         return this.skilllist.contains(SkillRegistry.REGISTRY.get().getKey(skill));
     }
     public boolean containsSkill(ResourceLocation skill) {

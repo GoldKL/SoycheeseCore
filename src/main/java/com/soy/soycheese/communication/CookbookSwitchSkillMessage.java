@@ -3,7 +3,7 @@ package com.soy.soycheese.communication;
 import com.soy.soycheese.capability.skilllist.PlayerSkillListProvider;
 import com.soy.soycheese.inventory.CookbookMenu;
 import com.soy.soycheese.registries.SkillRegistry;
-import com.soy.soycheese.skill.BaseSkill;
+import com.soy.soycheese.skill.AbstractSkill;
 import com.soy.soycheese.tracking.ForgeEventListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,8 +14,6 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.function.Supplier;
-
-import static com.soy.soycheese.tracking.ForgeEventListener.syncPlayerSkillList;
 
 public class CookbookSwitchSkillMessage {
     private final int buttonID, x, y, z;
@@ -71,11 +69,11 @@ public class CookbookSwitchSkillMessage {
         if (!world.hasChunkAt(new BlockPos(x, y, z)))
             return;
         if (buttonID == 0) {
-            BaseSkill bsk = SkillRegistry.getSkill(skill);
+            AbstractSkill bsk = SkillRegistry.getSkill(skill);
             if (bsk != null) {
                 if (isequip) {
                     entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
-                        BaseSkill old_bsk = SkillRegistry.getSkill(list.getSkilllist().get(bsk.getType()));
+                        AbstractSkill old_bsk = SkillRegistry.getSkill(list.getSkilllist().get(bsk.getType()));
                         if (old_bsk != null) {
                             list.removeSkill(bsk.getType());
                             old_bsk.onUnequip(entity);
@@ -85,7 +83,7 @@ public class CookbookSwitchSkillMessage {
                         for(int i = 0; i < 4 ;++i)
                         {
                             if(i == bsk.getType())continue;
-                            BaseSkill other_bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
+                            AbstractSkill other_bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
                             if (other_bsk != null) {
                                 other_bsk.onChangeOtherEquip(entity,bsk,old_bsk);
                             }
@@ -100,7 +98,7 @@ public class CookbookSwitchSkillMessage {
                         for(int i = 0; i < 4 ;++i)
                         {
                             if(i == bsk.getType())continue;
-                            BaseSkill other_bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
+                            AbstractSkill other_bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
                             if (other_bsk != null) {
                                 other_bsk.onChangeOtherEquip(entity,null,bsk);
                             }

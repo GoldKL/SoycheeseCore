@@ -9,6 +9,7 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
     public EnchantedGoldenAppleSkill() {
         super(0);
     }
+    @Override
     public boolean getIslock(Player player) {
         PlayerFoodList playerFoodList = player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).orElse(null);
         if (playerFoodList != null) {
@@ -16,6 +17,7 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
         }
         return false;
     }
+    @Override
     public void onTick(Player player) {
         if(player.level().isClientSide)return;
         if(player.tickCount % 50 == 0)

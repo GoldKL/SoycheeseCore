@@ -1,57 +1,57 @@
 package com.soy.soycheese.skill;
 
-import com.soy.soycheese.SoycheeseCore;
-import net.minecraft.Util;
-
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import com.soy.soycheese.registries.SkillRegistry;
-
-public abstract class BaseSkill {
-    @Nullable
-    private String nameid;
-    private final int type;//0 1 2 3 分类
+public class BaseSkill extends AbstractSkill {
     public BaseSkill(int type) {
-        this.type = type;
+        super(type);
     }
-    public String getOrCreateNameid() {
-        if (this.nameid == null) {
-            this.nameid = Util.makeDescriptionId("soyskill", SkillRegistry.REGISTRY.get().getKey(this));
-        }
-        return this.nameid;
+    public static BaseSkill.Builder builder(int type) {
+        return new BaseSkill.Builder(type);
     }
-    public Component getDescription(Player player) {
+    protected BaseSkill(BaseSkill.Builder builder) {
+        this(builder.type);
+    }
+    @Override
+    public Component getDescription(Player player)  {
         if(this.getIslock(player))
             return Component.translatable(getOrCreateNameid() + ".lock");
         return Component.translatable(getOrCreateNameid() + ".unlock");
     }
+
+    @Override
     public boolean getIslock(Player player) {
         return true;
     }
-    public Component getName() {
-        return Component.translatable(this.getOrCreateNameid());
-    }
-    public int getType() {
-        return this.type;
-    }
-    public ResourceLocation getSkillIconResource() {
-        return new ResourceLocation(SoycheeseCore.MODID, "textures/gui/skill_icons/" + this.getOrCreateNameid() + ".png");
-    }
+
+    @Override
     public void onTick(Player player) {
-        //该效果每玩家刻执行
     }
+
+    @Override
     public void onEquip(Player player) {
-        //此时技能已被装备
     }
+
+    @Override
     public void onUnequip(Player player) {
-        //此时技能已被卸下
     }
-    public void onChangeOtherEquip(Player player,@Nullable BaseSkill newskill,@Nullable BaseSkill oldskill) {
-        //当其他的技能改变时，此时新技能已被装备，旧技能已被卸载
+
+    @Override
+    public void onChangeOtherEquip(Player player, @Nullable AbstractSkill newskill, @Nullable AbstractSkill oldskill) {
+    }
+    public static class Builder {
+        int type;
+        public Builder(int type)
+        {
+            this.type = type;
+        }
+        public BaseSkill build() {
+            return build(BaseSkill::new);
+        }
+        public BaseSkill build(java.util.function.Function<Builder, BaseSkill> builder) {
+            return builder.apply(this);
+        }
     }
 }
