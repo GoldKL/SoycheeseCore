@@ -52,13 +52,11 @@ public class ForgeEventListener {
     public static void onPlayerDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         syncPlayerFoodList(event.getEntity());
         syncPlayerSkillList(event.getEntity());
-        recheckPlayerSkillList(event.getEntity());
     }
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         syncPlayerFoodList(event.getEntity());
         syncPlayerSkillList(event.getEntity());
-        recheckPlayerSkillList(event.getEntity());
     }
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event) {
@@ -66,13 +64,10 @@ public class ForgeEventListener {
             event.player.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent( cap -> {
                cap.getSkilllist().stream()
                        .forEach( skillres ->{
-                           if(skillres!= PlayerSkillList.noneSkill)
+                           var skill = SkillRegistry.getSkill(skillres);
+                           if(skill != null)
                            {
-                               var skill = SkillRegistry.getSkill(skillres);
-                               if(skill != null)
-                               {
-                                   skill.onTick(event.player);
-                               }
+                               skill.onTick(event.player);
                            }
                        });
             });
@@ -98,19 +93,25 @@ public class ForgeEventListener {
     }
     public static void recheckPlayerSkillList(Player player) {
         if (player.level().isClientSide) return;
+        //attribute会在重生后重置，所以这里主要处理重生后的技能重检
         var target = (ServerPlayer) player;
-        target.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(cap->{
-            cap.getSkilllist().stream()
-                    .forEach( skillres ->{
-                        if(skillres!= PlayerSkillList.noneSkill)
-                        {
-                            var skill = SkillRegistry.getSkill(skillres);
-                            if(skill != null)
-                            {
-                                skill.onEquip(target);
-                            }
-                        }
-                    });
-        });
+        PlayerSkillList list = target.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+        if(list != null)
+        {
+            for(int i = 0; i < 4; ++i)
+            {
+                var now_skill = SkillRegistry.getSkill(list.getSkilllist().get(i));
+                if(now_skill != null)
+                {
+                    now_skill.onEquip(player);
+                    for(int j = 0 ; j < i ;++j)
+                    {
+                        var last_skill = SkillRegistry.getSkill(list.getSkilllist().get(j));
+                        if(last_skill != null)
+                            last_skill.onChangeOtherEquip(player,now_skill,null);
+                    }
+                }
+            }
+        }
     }
 }
