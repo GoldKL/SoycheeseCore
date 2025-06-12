@@ -1,0 +1,1 @@
+com.soy.soycheese.kubejs.SkillPlugin

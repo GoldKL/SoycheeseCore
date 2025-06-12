@@ -11,14 +11,10 @@ import com.soy.soycheese.skill.KubejsSkill;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.TropicalFish;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -76,7 +72,7 @@ public class SkillRegistry {
         if(resourceLocation == null||resourceLocation.equals(PlayerSkillList.noneSkill)) return null;
         return REGISTRY.get().getValue(resourceLocation);
     }
-    public static Collection<RegistryObject<AbstractSkill>> getSkills() {
-        return SKILLS.getEntries();
+    public static Collection<AbstractSkill> getSkills() {
+        return REGISTRY.get().getValues();
     }
 }

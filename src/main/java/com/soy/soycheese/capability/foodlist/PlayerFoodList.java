@@ -7,6 +7,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -31,6 +32,9 @@ public class PlayerFoodList {
     }
     public void removeFood(Item food) {
         this.foodlist.remove(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(food));
+    }
+    public boolean containsFood(ItemStack food) {
+        return this.foodlist.contains(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(food.getItem()));
     }
     public boolean containsFood(Item food) {
         return this.foodlist.contains(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(food));

@@ -14,6 +14,8 @@ import com.soy.soycheese.registries.SkillRegistry;
 public abstract class AbstractSkill {
     @Nullable
     private String nameid;
+    @Nullable
+    private ResourceLocation icon;
     private final int type;//0 1 2 3 分类
     public AbstractSkill(int type) {
         this.type = type;
@@ -24,6 +26,13 @@ public abstract class AbstractSkill {
         }
         return this.nameid;
     }
+    public ResourceLocation getorCreateIcon() {
+        ResourceLocation res = SkillRegistry.REGISTRY.get().getKey(this);
+        if(this.icon == null && res != null) {
+            this.icon = res;
+        }
+        return this.icon;
+    }
     public abstract Component getDescription(Player player);
     public abstract boolean getIslock(Player player);
     public Component getName() {
@@ -33,7 +42,7 @@ public abstract class AbstractSkill {
         return this.type;
     }
     public ResourceLocation getSkillIconResource() {
-        return new ResourceLocation(SoycheeseCore.MODID, "textures/gui/skill_icons/" + this.getOrCreateNameid() + ".png");
+        return new ResourceLocation(this.getorCreateIcon().getNamespace(), "soycheese_core/soyskill_icons/" +this.getorCreateIcon().getPath() + ".png");
     }
     //该效果每玩家刻执行
     public abstract void onTick(Player player);

@@ -1,6 +1,7 @@
 package com.soy.soycheese.skill;
 
 
+import com.soy.soycheese.kubejs.KubejsSkillBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,10 @@ public class KubejsSkill extends AbstractSkill {
         this.getDescription = getDescription;
         this.getIslock = getIslock;
     }
-    protected KubejsSkill(Builder builder) {
+    public KubejsSkill(KubejsSkillBuilder builder) {
+        this(builder.type, builder.onTick, builder.onEquip, builder.onUnequip, builder.onChangeOtherEquip, builder.getDescription, builder.getIslock);
+    }
+    protected KubejsSkill(KubejsSkill.Builder builder) {
         this(builder.type, builder.onTick, builder.onEquip, builder.onUnequip, builder.onChangeOtherEquip, builder.getDescription, builder.getIslock);
     }
     public static KubejsSkill.Builder builder(int type) {
