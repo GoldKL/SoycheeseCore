@@ -25,7 +25,6 @@ import java.lang.Integer;
 public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
     private final static HashMap<String, Object> guistate = CookbookMenu.guistate;
     private final Level world;
-    private final int x, y, z;
     private final Player entity;
     private Button pre_page;
     private Button next_page;
@@ -57,9 +56,6 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
     public CookbookScreen(CookbookMenu container, Inventory inventory, Component text) {
         super(container, inventory, text);
         this.world = container.world;
-        this.x = container.x;
-        this.y = container.y;
-        this.z = container.z;
         this.entity = container.entity;
         this.imageWidth = 283;//背景+右侧
         this.imageHeight = 245;//背景+底部
@@ -340,11 +336,11 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                         entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
                             if(list.containsSkill(bsk))
                             {
-                                SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,false,0,x,y,z));
+                                SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,false,0));
                             }
                             else
                             {
-                                SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,true,0,x,y,z));
+                                SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,true,0));
                             }
                         });
                     }
@@ -412,7 +408,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                         });
                         AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
                         entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
-                            SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,false,0,x,y,z));
+                            SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,false,0));
                             screenVar.choose_skill = -1;
                         });
                     }
@@ -595,11 +591,11 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                 if (!bsk.getIslock(entity)) {
                     entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
                         if (list.containsSkill(bsk)) {
-                            SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill, false, 0, x, y, z));
+                            SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill, false, 0));
                             if (screenVar.choose_skill >= 28)
                                 screenVar.choose_skill = -1;
                         } else {
-                            SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill, true, 0, x, y, z));
+                            SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill, true, 0));
                         }
                     });
                 }

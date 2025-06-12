@@ -24,6 +24,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -52,9 +53,9 @@ public class FoodTracker {
             list.addFood(usedItem.getItem());
         });
         ForgeEventListener.syncPlayerFoodList(player);
-    /*打开天赋系统*/
+    /*打开天赋系统
         if (player instanceof ServerPlayer _ent) {
-            BlockPos _bpos = BlockPos.containing(_ent.getX(), _ent.getY(), _ent.getZ());
+            _ent.stopUsingItem();
             NetworkHooks.openScreen((ServerPlayer) _ent, new MenuProvider() {
                 @Override
                 public Component getDisplayName() {
@@ -63,11 +64,20 @@ public class FoodTracker {
 
                 @Override
                 public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                    return new CookbookMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
+                    return new CookbookMenu(id, inventory, null);
+                    //new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos)
                 }
-            }, _bpos);
+            });
         }
-    /**/
+    */
+    }
+    @SubscribeEvent
+    public static void onPlayerAttacked(LivingAttackEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if(!player.isAlive()) return;
+        if(player.level().isClientSide) return;
+        if(player.containerMenu instanceof CookbookMenu)
+            player.closeContainer();
     }
     //ItemTooltipEvent 用来修改鼠标放上去的显示，只用于客户端
 }

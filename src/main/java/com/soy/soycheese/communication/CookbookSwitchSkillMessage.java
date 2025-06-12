@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.function.Supplier;
 
 public class CookbookSwitchSkillMessage {
-    private final int buttonID, x, y, z;
+    private final int buttonID;
     private final ResourceLocation skill;
     private final boolean isequip;
 
@@ -24,27 +24,18 @@ public class CookbookSwitchSkillMessage {
         this.skill = buffer.readResourceLocation();
         this.isequip = buffer.readBoolean();
         this.buttonID = buffer.readInt();
-        this.x = buffer.readInt();
-        this.y = buffer.readInt();
-        this.z = buffer.readInt();
     }
 
-    public CookbookSwitchSkillMessage(ResourceLocation skill,boolean isequip,int buttonID,int x, int y, int z) {
+    public CookbookSwitchSkillMessage(ResourceLocation skill,boolean isequip,int buttonID) {
         this.skill = skill;
         this.isequip = isequip;
         this.buttonID = buttonID;
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     public static void buffer(CookbookSwitchSkillMessage message, FriendlyByteBuf buffer) {
         buffer.writeResourceLocation(message.skill);
         buffer.writeBoolean(message.isequip);
         buffer.writeInt(message.buttonID);
-        buffer.writeInt(message.x);
-        buffer.writeInt(message.y);
-        buffer.writeInt(message.z);
     }
 
     public static void handler(CookbookSwitchSkillMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -54,20 +45,15 @@ public class CookbookSwitchSkillMessage {
             ResourceLocation skill = message.skill;
             boolean isequip = message.isequip;
             int buttonID = message.buttonID;
-            int x = message.x;
-            int y = message.y;
-            int z = message.z;
-            handleButtonAction(entity, skill ,isequip, buttonID, x, y, z);
+            handleButtonAction(entity, skill ,isequip, buttonID);
         });
         context.setPacketHandled(true);
     }
 
-    public static void handleButtonAction(Player entity,ResourceLocation skill,boolean isequip, int buttonID, int x, int y, int z) {
+    public static void handleButtonAction(Player entity,ResourceLocation skill,boolean isequip, int buttonID) {
         Level world = entity.level();
         HashMap guistate = CookbookMenu.guistate;
         // security measure to prevent arbitrary chunk generation
-        if (!world.hasChunkAt(new BlockPos(x, y, z)))
-            return;
         if (buttonID == 0) {
             AbstractSkill bsk = SkillRegistry.getSkill(skill);
             if (bsk != null) {
