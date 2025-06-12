@@ -71,7 +71,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         }
         //遍历所有技能
         SkillRegistry.getSkills().stream()
-                .map(RegistryObject::get)
+                //.map(RegistryObject::get)
                 .forEach(skill -> {
                     //SoycheeseCore.LOGGER.info(REGISTRY.get().getKey(skill).toString());
                     //SoycheeseCore.LOGGER.info(skill.getOrCreateNameid());
