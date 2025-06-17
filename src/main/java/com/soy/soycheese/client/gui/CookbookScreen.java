@@ -7,7 +7,7 @@ import com.soy.soycheese.capability.skilllist.PlayerSkillListProvider;
 import com.soy.soycheese.communication.CookbookSwitchSkillMessage;
 import com.soy.soycheese.inventory.CookbookMenu;
 import com.soy.soycheese.registries.SkillRegistry;
-import com.soy.soycheese.skill.AbstractSkill;
+import com.soy.soycheese.skill.BaseSkill;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -16,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
     private final ScreenVar screenVar = new ScreenVar();
     private int getskilldeslength(ResourceLocation now_skill)
     {
-        AbstractSkill bsk = SkillRegistry.getSkill(now_skill);
+        BaseSkill bsk = SkillRegistry.getSkill(now_skill);
         if(bsk != null)
             return 21 + 9 * this.font.split(bsk.getDescription(entity), 82).size();
         return 0;
@@ -106,7 +105,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         guiGraphics.blit(newtexture, this.leftPos, this.topPos, 0, 0, 256, 223, 256, 256);
         //已选择技能图标
         if(screenVar.now_skill != null && SkillRegistry.getSkill(screenVar.now_skill) != null) {
-            AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+            BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
             guiGraphics.enableScissor(this.leftPos + 25, this.topPos + 60, this.leftPos+109, this.topPos+171);
             guiGraphics.blit(element_texture, this.leftPos + 57, this.topPos + 60 - screenVar.fix_des, 1, 1, 20, 20, 256, 256);
             if (bsk != null) {
@@ -129,7 +128,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         for(int i = 0; i < 28 ; ++i) {
             int num = screenVar.now_page * 28 + i;
             if(num >= skills.get(screenVar.now_kind).get(screenVar.now_read_mode).size())break;
-            AbstractSkill bsk = SkillRegistry.getSkill(skills.get(screenVar.now_kind).get(screenVar.now_read_mode).get(num));
+            BaseSkill bsk = SkillRegistry.getSkill(skills.get(screenVar.now_kind).get(screenVar.now_read_mode).get(num));
             //还可以额外加参数把图片缩小
             guiGraphics.blit(element_texture, this.leftPos + 146 + (i % 4) * 22, this.topPos + 30 + (i / 4) * 23, 1, 1, 20, 20, 256, 256);
             if(screenVar.choose_skill == i)
@@ -144,7 +143,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         //输出玩家技能
         entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
             for(int i = 0; i < 4; ++i) {
-                AbstractSkill bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
+                BaseSkill bsk = SkillRegistry.getSkill(list.getSkilllist().get(i));
                 guiGraphics.blit(element_texture, this.leftPos+ 24 + i * 22, this.topPos+30, 1, 1, 20, 20, 256, 256);
                 if(screenVar.choose_skill >= 28 && screenVar.choose_skill == i + 28)
                     guiGraphics.blit(element_texture, this.leftPos + 23 + i * 22, this.topPos + 29, 22, 0, 22, 22, 256, 256);
@@ -208,7 +207,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
         }
         //装备按钮
         if(screenVar.now_skill != null) {
-            AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+            BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
             if (bsk != null) {
                 if(!bsk.getIslock(entity)) {
                     if(gx >= this.leftPos + 25 && gy >= this.topPos+175 && gx <= this.leftPos + 97 && gy <= this.topPos+197)
@@ -285,7 +284,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if(screenVar.now_skill != null)
         {
-            AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+            BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
             if(bsk != null)
             {
                 guiGraphics.enableScissor(this.leftPos + 25, this.topPos + 60, this.leftPos+109, this.topPos+171);
@@ -332,7 +331,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                         screenVar.now_skill = skills.get(screenVar.now_kind).get(screenVar.now_read_mode).get(num);
                         screenVar.skill_des_length = getskilldeslength(screenVar.now_skill);
                         screenVar.fix_des = 0;
-                        AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                        BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
                         entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
                             if(list.containsSkill(bsk))
                             {
@@ -406,7 +405,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                             screenVar.skill_des_length = getskilldeslength(screenVar.now_skill);
                             screenVar.fix_des = 0;
                         });
-                        AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                        BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
                         entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
                             SoycheeseCore.channel.sendToServer(new CookbookSwitchSkillMessage(screenVar.now_skill,false,0));
                             screenVar.choose_skill = -1;
@@ -586,7 +585,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
 
         //装备/卸下按钮
         equip_unequip_skills_buttons = Button.builder(Component.translatable("gui.soycheese_core.cookbook.notext_button"), e -> {
-            AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+            BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
             if(bsk != null) {
                 if (!bsk.getIslock(entity)) {
                     entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent(list -> {
@@ -607,7 +606,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
             @Override
             public boolean keyPressed(int p_93374_, int p_93375_, int p_93376_)
             {
-                AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
                 if(bsk != null) {
                     if (!bsk.getIslock(entity)){
                         return super.keyPressed(p_93374_, p_93375_, p_93376_);
@@ -621,7 +620,7 @@ public class CookbookScreen extends AbstractContainerScreen<CookbookMenu> {
                 boolean ret = super.clicked(p_93681_, p_93682_);
                 if(ret)
                 {
-                    AbstractSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
+                    BaseSkill bsk = SkillRegistry.getSkill(screenVar.now_skill);
                     if(bsk != null) {
                         return !bsk.getIslock(entity);
                     }

@@ -1,7 +1,7 @@
 package com.soy.soycheese.capability.skilllist;
 
 import com.soy.soycheese.SoycheeseCore;
-import com.soy.soycheese.skill.AbstractSkill;
+import com.soy.soycheese.skill.BaseSkill;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -31,7 +31,7 @@ public class PlayerSkillList {
         this.skilllist.clear();
         this.skilllist.addAll(Arrays.asList(noneSkill,noneSkill,noneSkill,noneSkill));
     }
-    public void setSkill(AbstractSkill skill, int slot) {
+    public void setSkill(BaseSkill skill, int slot) {
         this.skilllist.set(slot,SkillRegistry.REGISTRY.get().getKey(skill));
     }
     public void removeSkill(int slot) {
@@ -42,12 +42,12 @@ public class PlayerSkillList {
         if(slot == -1) return;
         removeSkill(slot);
     }
-    public void removeSkill(AbstractSkill skill) {
+    public void removeSkill(BaseSkill skill) {
         int slot = this.skilllist.indexOf(SkillRegistry.REGISTRY.get().getKey(skill));
         if(slot == -1) return;
         removeSkill(slot);
     }
-    public boolean containsSkill(AbstractSkill skill) {
+    public boolean containsSkill(BaseSkill skill) {
         return this.skilllist.contains(SkillRegistry.REGISTRY.get().getKey(skill));
     }
     public boolean containsSkill(ResourceLocation skill) {

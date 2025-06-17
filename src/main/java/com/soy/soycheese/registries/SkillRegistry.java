@@ -4,7 +4,6 @@ import com.soy.soycheese.SoycheeseCore;
 import com.soy.soycheese.capability.foodlist.PlayerFoodList;
 import com.soy.soycheese.capability.foodlist.PlayerFoodListProvider;
 import com.soy.soycheese.capability.skilllist.PlayerSkillList;
-import com.soy.soycheese.skill.AbstractSkill;
 import com.soy.soycheese.skill.BaseSkill;
 import com.soy.soycheese.skill.EnchantedGoldenAppleSkill;
 import com.soy.soycheese.skill.KubejsSkill;
@@ -21,12 +20,12 @@ import java.util.function.Supplier;
 
 public class SkillRegistry {
 
-    public static final ResourceKey<Registry<AbstractSkill>> SKILL_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(SoycheeseCore.MODID, "skills"));
-    private static final DeferredRegister<AbstractSkill> SKILLS = DeferredRegister.create(SKILL_REGISTRY_KEY, SoycheeseCore.MODID);
-    public static final Supplier<IForgeRegistry<AbstractSkill>> REGISTRY = SKILLS.makeRegistry(() -> new RegistryBuilder<AbstractSkill>().disableSaving().disableOverrides());
+    public static final ResourceKey<Registry<BaseSkill>> SKILL_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(SoycheeseCore.MODID, "skills"));
+    private static final DeferredRegister<BaseSkill> SKILLS = DeferredRegister.create(SKILL_REGISTRY_KEY, SoycheeseCore.MODID);
+    public static final Supplier<IForgeRegistry<BaseSkill>> REGISTRY = SKILLS.makeRegistry(() -> new RegistryBuilder<BaseSkill>().disableSaving().disableOverrides());
 
-    public static final RegistryObject<AbstractSkill> ENCHANTEDGOLDENAPPLE = SKILLS.register("enchanted_golden_apple", EnchantedGoldenAppleSkill::new);
-    public static final RegistryObject<AbstractSkill> ENCHANTEDGOLDENAPPLE2 = SKILLS.register("enchanted_golden_apple2", ()->BaseSkill.builder(0).build( builder -> new BaseSkill(builder) {
+    public static final RegistryObject<BaseSkill> ENCHANTEDGOLDENAPPLE = SKILLS.register("enchanted_golden_apple", EnchantedGoldenAppleSkill::new);
+    public static final RegistryObject<BaseSkill> ENCHANTEDGOLDENAPPLE2 = SKILLS.register("enchanted_golden_apple2", ()->new BaseSkill.Builder(0).build( builder -> new BaseSkill(builder) {
         @Override
         public boolean getIslock(Player player) {
             PlayerFoodList playerFoodList = player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).orElse(null);
@@ -46,7 +45,7 @@ public class SkillRegistry {
             }
         }
     }));
-    public static final RegistryObject<AbstractSkill> ENCHANTEDGOLDENAPPLE3 = SKILLS.register("enchanted_golden_apple3",
+    public static final RegistryObject<BaseSkill> ENCHANTEDGOLDENAPPLE3 = SKILLS.register("enchanted_golden_apple3",
             ()->KubejsSkill.builder(0).getIslock(((kubejsSkill, player) -> {
                         PlayerFoodList playerFoodList = player.getCapability(PlayerFoodListProvider.PLAYER_FOOD_LIST_CAPABILITY).orElse(null);
                         if (playerFoodList != null) {
@@ -68,11 +67,11 @@ public class SkillRegistry {
     public static void register(IEventBus eventBus) {
         SKILLS.register(eventBus);
     }
-    public static AbstractSkill getSkill(ResourceLocation resourceLocation) {
+    public static BaseSkill getSkill(ResourceLocation resourceLocation) {
         if(resourceLocation == null||resourceLocation.equals(PlayerSkillList.noneSkill)) return null;
         return REGISTRY.get().getValue(resourceLocation);
     }
-    public static Collection<AbstractSkill> getSkills() {
+    public static Collection<BaseSkill> getSkills() {
         return REGISTRY.get().getValues();
     }
 }

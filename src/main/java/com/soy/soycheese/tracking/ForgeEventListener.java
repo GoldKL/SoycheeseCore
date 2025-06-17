@@ -8,9 +8,15 @@ import com.soy.soycheese.capability.skilllist.PlayerSkillListProvider;
 import com.soy.soycheese.communication.PlayerFoodListMessage;
 import com.soy.soycheese.communication.PlayerSkillListMessage;
 import com.soy.soycheese.registries.SkillRegistry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -60,7 +66,7 @@ public class ForgeEventListener {
     public static void playerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             event.player.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).ifPresent( cap -> {
-               cap.getSkilllist().stream()
+               cap.getSkilllist()
                        .forEach( skillres ->{
                            var skill = SkillRegistry.getSkill(skillres);
                            if(skill != null)
@@ -69,6 +75,137 @@ public class ForgeEventListener {
                            }
                        });
             });
+        }
+    }
+    @SubscribeEvent
+    public static void onLivingAttack(LivingAttackEvent event) {
+        LivingEntity entity = event.getEntity();
+        Entity attacker = event.getSource().getEntity();
+        //攻击时
+        if(attacker instanceof Player player) {
+            PlayerSkillList skilllist = attacker.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+            if(skilllist != null) {
+                for(ResourceLocation skillres : skilllist.getSkilllist()) {
+                    var skill = SkillRegistry.getSkill(skillres);
+                    if(skill != null)
+                    {
+                        if(skill.onAttack(player,entity,event.getSource(),event.getAmount()))
+                        {
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        //被攻击时
+        if(entity instanceof Player player) {
+            PlayerSkillList skilllist = entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+            if(skilllist != null) {
+                for(ResourceLocation skillres : skilllist.getSkilllist()) {
+                    var skill = SkillRegistry.getSkill(skillres);
+                    if(skill != null)
+                    {
+                        if(skill.onAttacked(player,event.getSource(),event.getAmount()))
+                        {
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void onLivingHurt(LivingHurtEvent event) {
+        LivingEntity entity = event.getEntity();
+        Entity attacker = event.getSource().getEntity();
+        //造成伤害时1
+        if(attacker instanceof Player player) {
+            PlayerSkillList skilllist = attacker.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+            if(skilllist != null) {
+                float amount = event.getAmount();
+                float baseamount = amount;
+                for(ResourceLocation skillres : skilllist.getSkilllist()) {
+                    var skill = SkillRegistry.getSkill(skillres);
+                    if(skill != null) {
+                        amount = skill.onHurt(player, entity, event.getSource(), baseamount, amount);
+                        if (amount <= 0.0)
+                        {
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
+                event.setAmount(amount);
+            }
+        }
+        //受到伤害时1
+        if(entity instanceof Player player) {
+            PlayerSkillList skilllist = entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+            if(skilllist != null) {
+                float amount = event.getAmount();
+                float baseamount = amount;
+                for(ResourceLocation skillres : skilllist.getSkilllist()) {
+                    var skill = SkillRegistry.getSkill(skillres);
+                    if(skill != null)
+                    {
+                        amount = skill.onHurted(player, event.getSource(), baseamount, amount);
+                        if (amount <= 0.0)
+                        {
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
+                event.setAmount(amount);
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void onLivingDamage(LivingDamageEvent event) {
+        LivingEntity entity = event.getEntity();
+        Entity attacker = event.getSource().getEntity();
+        //造成伤害时2
+        if(attacker instanceof Player player) {
+            PlayerSkillList skilllist = attacker.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+            if(skilllist != null) {
+                float amount = event.getAmount();
+                float baseamount = amount;
+                for(ResourceLocation skillres : skilllist.getSkilllist()) {
+                    var skill = SkillRegistry.getSkill(skillres);
+                    if(skill != null) {
+                        amount = skill.onDamage(player, entity, event.getSource(), baseamount, amount);
+                        if (amount <= 0.0)
+                        {
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
+                event.setAmount(amount);
+            }
+        }
+        //受到伤害时2
+        if(entity instanceof Player player) {
+            PlayerSkillList skilllist = entity.getCapability(PlayerSkillListProvider.PLAYER_SKILL_LIST_CAPABILITY).orElse(null);
+            if(skilllist != null) {
+                float amount = event.getAmount();
+                float baseamount = amount;
+                for(ResourceLocation skillres : skilllist.getSkilllist()) {
+                    var skill = SkillRegistry.getSkill(skillres);
+                    if(skill != null)
+                    {
+                        amount = skill.onDamaged(player, event.getSource(), baseamount, amount);
+                        if (amount <= 0.0)
+                        {
+                            event.setCanceled(true);
+                            return;
+                        }
+                    }
+                }
+                event.setAmount(amount);
+            }
         }
     }
     public static void syncPlayerFoodList(Player player) {

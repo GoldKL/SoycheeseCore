@@ -16,12 +16,18 @@ public class KubejsSkillBuilder extends BuilderBase<KubejsSkill> {
         super(i);
         this.type = 0;
     }
-    public BiConsumer<KubejsSkill, Player> onTick;
+    public BiConsumer<KubejsSkill,Player> onTick;
     public BiConsumer<KubejsSkill,Player> onEquip;
     public BiConsumer<KubejsSkill,Player> onUnequip;
     public BiConsumer<KubejsSkill, KubejsSkill.SkillContext> onChangeOtherEquip;
     public BiFunction<KubejsSkill,Player, Component> getDescription;
     public BiFunction<KubejsSkill,Player, Boolean> getIslock;
+    public BiFunction<KubejsSkill, KubejsSkill.AttackContext, Boolean> onAttack;
+    public BiFunction<KubejsSkill, KubejsSkill.AttackedContext,Boolean> onAttacked;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Boolean> onHurt;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Boolean> onHurted;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Boolean> onDamage;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Boolean> onDamaged;
     public int type;
     @Info("Set the skill's type")
     public KubejsSkillBuilder type(int type) {
@@ -58,6 +64,36 @@ public class KubejsSkillBuilder extends BuilderBase<KubejsSkill> {
         this.getIslock = getIslock;
         return this;
     }
+    @Info("Set player when player attacks")
+    public KubejsSkillBuilder onAttack(BiFunction<KubejsSkill, KubejsSkill.AttackContext, Boolean> onAttack) {
+        this.onAttack = onAttack;
+        return this;
+    }
+    @Info("Set player when player is attacked")
+    public KubejsSkillBuilder onAttacked(BiFunction<KubejsSkill, KubejsSkill.AttackedContext, Boolean> onAttacked) {
+        this.onAttacked = onAttacked;
+        return this;
+    }
+    @Info("Set player when player hurts")
+    public KubejsSkillBuilder onHurt(BiFunction<KubejsSkill, KubejsSkill.HurtContext, Boolean> onHurt) {
+        this.onHurt = onHurt;
+        return this;
+    }
+    @Info("Set player when player is hurt")
+    public KubejsSkillBuilder onHurted(BiFunction<KubejsSkill, KubejsSkill.HurtedContext, Boolean> onHurted) {
+        this.onHurted = onHurted;
+        return this;
+    }
+    @Info("Set player when player damages")
+    public KubejsSkillBuilder onDamage(BiFunction<KubejsSkill, KubejsSkill.HurtContext, Boolean> onDamage) {
+        this.onDamage = onDamage;
+        return this;
+    }
+    @Info("Set player when player is damaged")
+    public KubejsSkillBuilder onDamaged(BiFunction<KubejsSkill, KubejsSkill.HurtedContext, Boolean> onDamaged) {
+        this.onDamaged = onDamaged;
+        return this;
+    }
     @Override
     public RegistryInfo getRegistryType() {
         return SkillPlugin.SKILLS;
@@ -65,22 +101,6 @@ public class KubejsSkillBuilder extends BuilderBase<KubejsSkill> {
 
     @Override
     public KubejsSkill createObject() {
-        if(this.onTick == null)
-            this.onTick = (kubejsSkill, player) -> {};
-        if(this.onEquip == null)
-            this.onEquip = (kubejsSkill, player) -> {};
-        if(this.onUnequip == null)
-            this.onUnequip = (kubejsSkill, player) -> {};
-        if(this.onChangeOtherEquip == null)
-            this.onChangeOtherEquip = (kubejsSkill, player) -> {};
-        if(this.getDescription == null)
-            this.getDescription = (kubejsSkill,player) ->{
-                if(kubejsSkill.getIslock(player))
-                    return Component.translatable(kubejsSkill.getOrCreateNameid() + ".lock");
-                return Component.translatable(kubejsSkill.getOrCreateNameid() + ".unlock");
-            };
-        if(this.getIslock == null)
-            this.getIslock = (kubejsSkill,player) -> true;
         return new KubejsSkill(this);
     }
 }
