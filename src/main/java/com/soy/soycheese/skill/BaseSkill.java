@@ -1,5 +1,6 @@
 package com.soy.soycheese.skill;
 
+import com.soy.soycheese.SoycheeseCore;
 import net.minecraft.Util;
 
 import net.minecraft.network.chat.Component;
@@ -12,17 +13,50 @@ import javax.annotation.Nullable;
 
 import com.soy.soycheese.registries.SkillRegistry;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 public class BaseSkill {
     @Nullable
     private String nameid;
     @Nullable
     private ResourceLocation icon;
     private final int type;//0 1 2 3 分类
+    private final LinkedHashMap<String,Object> skill_arguments;
     public BaseSkill(int type) {
         this.type = type;
+        this.skill_arguments = new LinkedHashMap<>();
+    }
+    public BaseSkill(int type,LinkedHashMap<String,Object> skill_arguments) {
+        this.type = type;
+        this.skill_arguments = skill_arguments;
     }
     protected BaseSkill(BaseSkill.Builder builder) {
         this(builder.type);
+    }
+    protected void initSkillArgument(String name, Object value) {
+        skill_arguments.put(name, value);
+    }
+    public void changeSkillArgument(String name, Object value) {
+        try {
+            if (!skill_arguments.containsKey(name)) {
+                throw new IllegalArgumentException("Skill argument " + name + " not found");
+            }
+            skill_arguments.put(name, value);
+        }catch (ClassCastException e) {
+            SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
+        }
+    }
+    public Object getSkillArgument(String name) {
+        try {
+            if (!skill_arguments.containsKey(name)) {
+                throw new IllegalArgumentException("Skill argument " + name + " not found");
+            }
+            return skill_arguments.get(name);
+        }catch (ClassCastException e) {
+            SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
+            return null;
+        }
     }
     public String getOrCreateNameid() {
         if (this.nameid == null) {
@@ -37,22 +71,28 @@ public class BaseSkill {
         }
         return this.icon;
     }
+    public Object[] getSkillArguments() {
+        return this.skill_arguments.values().toArray();
+    }
     //获取该技能描述，一般不用重写
     public Component getDescription(Player player)  {
         if(this.getIslock(player))
             return Component.translatable(getOrCreateNameid() + ".lock");
-        return Component.translatable(getOrCreateNameid() + ".unlock");
+        return Component.translatable(getOrCreateNameid() + ".unlock",this.getSkillArguments());
     }
     //确认该技能是否解锁，一般要重写
     public boolean getIslock(Player player) {
         return true;
     }
+    //获取技能名称
     public Component getName() {
         return Component.translatable(this.getOrCreateNameid());
     }
+    //获取技能类别
     public int getType() {
         return this.type;
     }
+    //获取技能图标
     public ResourceLocation getSkillIconResource() {
         return new ResourceLocation(this.getorCreateIcon().getNamespace(), "soycheese_core/soyskill_icons/" +this.getorCreateIcon().getPath() + ".png");
     }

@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.LinkedHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -24,11 +25,17 @@ public class KubejsSkillBuilder extends BuilderBase<KubejsSkill> {
     public BiFunction<KubejsSkill,Player, Boolean> getIslock;
     public BiFunction<KubejsSkill, KubejsSkill.AttackContext, Boolean> onAttack;
     public BiFunction<KubejsSkill, KubejsSkill.AttackedContext,Boolean> onAttacked;
-    public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Boolean> onHurt;
-    public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Boolean> onHurted;
-    public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Boolean> onDamage;
-    public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Boolean> onDamaged;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Float> onHurt;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Float> onHurted;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Float> onDamage;
+    public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Float> onDamaged;
+    public final LinkedHashMap<String,Object> skill_arguments = new LinkedHashMap<>();
     public int type;
+    @Info("Set the skill's argument")
+    public KubejsSkillBuilder initSkillArgument(String name, Object value) {
+        this.skill_arguments.put(name, value);
+        return this;
+    }
     @Info("Set the skill's type")
     public KubejsSkillBuilder type(int type) {
         this.type = type;
@@ -75,22 +82,22 @@ public class KubejsSkillBuilder extends BuilderBase<KubejsSkill> {
         return this;
     }
     @Info("Set player when player hurts")
-    public KubejsSkillBuilder onHurt(BiFunction<KubejsSkill, KubejsSkill.HurtContext, Boolean> onHurt) {
+    public KubejsSkillBuilder onHurt(BiFunction<KubejsSkill, KubejsSkill.HurtContext, Float> onHurt) {
         this.onHurt = onHurt;
         return this;
     }
     @Info("Set player when player is hurt")
-    public KubejsSkillBuilder onHurted(BiFunction<KubejsSkill, KubejsSkill.HurtedContext, Boolean> onHurted) {
+    public KubejsSkillBuilder onHurted(BiFunction<KubejsSkill, KubejsSkill.HurtedContext, Float> onHurted) {
         this.onHurted = onHurted;
         return this;
     }
     @Info("Set player when player damages")
-    public KubejsSkillBuilder onDamage(BiFunction<KubejsSkill, KubejsSkill.HurtContext, Boolean> onDamage) {
+    public KubejsSkillBuilder onDamage(BiFunction<KubejsSkill, KubejsSkill.HurtContext, Float> onDamage) {
         this.onDamage = onDamage;
         return this;
     }
     @Info("Set player when player is damaged")
-    public KubejsSkillBuilder onDamaged(BiFunction<KubejsSkill, KubejsSkill.HurtedContext, Boolean> onDamaged) {
+    public KubejsSkillBuilder onDamaged(BiFunction<KubejsSkill, KubejsSkill.HurtedContext, Float> onDamaged) {
         this.onDamaged = onDamaged;
         return this;
     }

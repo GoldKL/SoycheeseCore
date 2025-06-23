@@ -8,6 +8,9 @@ import net.minecraft.world.item.Items;
 public class EnchantedGoldenAppleSkill extends BaseSkill {
     public EnchantedGoldenAppleSkill() {
         super(0);
+        this.initSkillArgument("player_tick_interval",50);
+        this.initSkillArgument("player_max_absorption_amount",20.0f);
+        this.initSkillArgument("player_add_absorption_amount",1.0f);
     }
     @Override
     public boolean getIslock(Player player) {
@@ -20,11 +23,12 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
     @Override
     public void onTick(Player player) {
         if(player.level().isClientSide)return;
-        if(player.tickCount % 50 == 0)
+        if(player.tickCount % (int)(this.getSkillArgument("player_tick_interval")) == 0)
         {
-            if(player.getAbsorptionAmount() < 20)
+            if(player.getAbsorptionAmount() < (float)this.getSkillArgument("player_max_absorption_amount"))
             {
-                player.setAbsorptionAmount(Math.min(20,player.getAbsorptionAmount() + (float)(1)));
+                player.setAbsorptionAmount(Math.min((float)this.getSkillArgument("player_max_absorption_amount")
+                        ,player.getAbsorptionAmount() + (float)this.getSkillArgument("player_add_absorption_amount")));
             }
         }
     }

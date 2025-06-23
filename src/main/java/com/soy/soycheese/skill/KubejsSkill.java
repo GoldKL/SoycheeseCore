@@ -8,6 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -20,10 +21,10 @@ public class KubejsSkill extends BaseSkill {
     private final BiFunction<KubejsSkill,Player,Boolean> getIslock;
     private final BiFunction<KubejsSkill,AttackContext,Boolean> onAttack;
     private final BiFunction<KubejsSkill,AttackedContext,Boolean> onAttacked;
-    private final BiFunction<KubejsSkill,HurtContext,Boolean> onHurt;
-    private final BiFunction<KubejsSkill,HurtedContext,Boolean> onHurted;
-    private final BiFunction<KubejsSkill,HurtContext,Boolean> onDamage;
-    private final BiFunction<KubejsSkill,HurtedContext,Boolean> onDamaged;
+    private final BiFunction<KubejsSkill,HurtContext,Float> onHurt;
+    private final BiFunction<KubejsSkill,HurtedContext,Float> onHurted;
+    private final BiFunction<KubejsSkill,HurtContext,Float> onDamage;
+    private final BiFunction<KubejsSkill,HurtedContext,Float> onDamaged;
     public static class SkillContext {
         public final Player player;
         @Nullable
@@ -85,6 +86,7 @@ public class KubejsSkill extends BaseSkill {
         }
     }
     public KubejsSkill(int type,
+                       LinkedHashMap<String,Object> skill_arguments,
                        BiConsumer<KubejsSkill,Player> onTick,
                        BiConsumer<KubejsSkill,Player> onEquip,
                        BiConsumer<KubejsSkill,Player> onUnequip,
@@ -93,11 +95,11 @@ public class KubejsSkill extends BaseSkill {
                        BiFunction<KubejsSkill,Player, Boolean> getIslock,
                        BiFunction<KubejsSkill,AttackContext, Boolean> onAttack,
                        BiFunction<KubejsSkill,AttackedContext,Boolean> onAttacked,
-                       BiFunction<KubejsSkill,HurtContext,Boolean> onHurt,
-                       BiFunction<KubejsSkill,HurtedContext,Boolean> onHurted,
-                       BiFunction<KubejsSkill,HurtContext,Boolean> onDamage,
-                       BiFunction<KubejsSkill,HurtedContext,Boolean> onDamageed) {
-        super(type);
+                       BiFunction<KubejsSkill,HurtContext,Float> onHurt,
+                       BiFunction<KubejsSkill,HurtedContext,Float> onHurted,
+                       BiFunction<KubejsSkill,HurtContext,Float> onDamage,
+                       BiFunction<KubejsSkill,HurtedContext,Float> onDamageed) {
+        super(type,skill_arguments);
         this.onTick = onTick;
         this.onEquip = onEquip;
         this.onUnequip = onUnequip;
@@ -112,7 +114,7 @@ public class KubejsSkill extends BaseSkill {
         this.onDamaged = onDamageed;
     }
     public KubejsSkill(KubejsSkillBuilder builder) {
-        this(builder.type,
+        this(builder.type,builder.skill_arguments,
                 builder.onTick,
                 builder.onEquip,
                 builder.onUnequip,
@@ -127,7 +129,7 @@ public class KubejsSkill extends BaseSkill {
                 builder.onDamaged);
     }
     protected KubejsSkill(KubejsSkill.Builder builder) {
-        this(builder.type,
+        this(builder.type,builder.skill_arguments,
                 builder.onTick,
                 builder.onEquip,
                 builder.onUnequip,
@@ -202,6 +204,30 @@ public class KubejsSkill extends BaseSkill {
             return super.onAttacked(player, source, damage);
         return this.onAttacked.apply(this,new AttackedContext(player,source,damage));
     }
+    @Override
+    public float onHurt(Player player, LivingEntity target, DamageSource source,float basedamage , float damage){
+        if(this.onHurt == null)
+            return super.onHurt(player, target, source, basedamage, damage);
+        return this.onHurt.apply(this,new HurtContext(player, target, source, basedamage, damage));
+    }
+    @Override
+    public float onHurted(Player player, DamageSource source,float basedamage , float damage){
+        if(this.onHurted == null)
+            return super.onHurted(player, source, basedamage, damage);
+        return this.onHurted.apply(this,new HurtedContext(player, source, basedamage, damage));
+    }
+    @Override
+    public float onDamage(Player player, LivingEntity target, DamageSource source,float basedamage , float damage){
+        if(this.onDamage == null)
+            return super.onDamage(player, target, source, basedamage, damage);
+        return this.onDamage.apply(this,new HurtContext(player, target, source, basedamage, damage));
+    }
+    @Override
+    public float onDamaged(Player player, DamageSource source,float basedamage , float damage){
+        if(this.onDamaged == null)
+            return super.onDamaged(player, source, basedamage, damage);
+        return this.onDamaged.apply(this,new HurtedContext(player, source, basedamage, damage));
+    }
     public static class Builder {
         private BiConsumer<KubejsSkill,Player> onTick;
         private BiConsumer<KubejsSkill,Player> onEquip;
@@ -211,14 +237,19 @@ public class KubejsSkill extends BaseSkill {
         private BiFunction<KubejsSkill,Player, Boolean> getIslock;
         private BiFunction<KubejsSkill,AttackContext, Boolean> onAttack;
         private BiFunction<KubejsSkill,AttackedContext,Boolean> onAttacked;
-        private BiFunction<KubejsSkill,HurtContext,Boolean> onHurt;
-        private BiFunction<KubejsSkill,HurtedContext,Boolean> onHurted;
-        private BiFunction<KubejsSkill,HurtContext,Boolean> onDamage;
-        private BiFunction<KubejsSkill,HurtedContext,Boolean> onDamaged;
+        private BiFunction<KubejsSkill,HurtContext,Float> onHurt;
+        private BiFunction<KubejsSkill,HurtedContext,Float> onHurted;
+        private BiFunction<KubejsSkill,HurtContext,Float> onDamage;
+        private BiFunction<KubejsSkill,HurtedContext,Float> onDamaged;
+        final LinkedHashMap<String,Object> skill_arguments = new LinkedHashMap<>();
         int type;
         public Builder(int type)
         {
             this.type = type;
+        }
+        public Builder initSkillArgument(String name, Object value) {
+            this.skill_arguments.put(name, value);
+            return this;
         }
         public Builder onTick(BiConsumer<KubejsSkill,Player> onTick) {
             this.onTick = onTick;
@@ -252,19 +283,19 @@ public class KubejsSkill extends BaseSkill {
             this.onAttacked = onAttacked;
             return this;
         }
-        public Builder onHurt(BiFunction<KubejsSkill,HurtContext, Boolean> onHurt) {
+        public Builder onHurt(BiFunction<KubejsSkill,HurtContext, Float> onHurt) {
             this.onHurt = onHurt;
             return this;
         }
-        public Builder onHurted(BiFunction<KubejsSkill,HurtedContext, Boolean> onHurted) {
+        public Builder onHurted(BiFunction<KubejsSkill,HurtedContext, Float> onHurted) {
             this.onHurted = onHurted;
             return this;
         }
-        public Builder onDamage(BiFunction<KubejsSkill,HurtContext, Boolean> onDamage) {
+        public Builder onDamage(BiFunction<KubejsSkill,HurtContext, Float> onDamage) {
             this.onDamage = onDamage;
             return this;
         }
-        public Builder onDamaged(BiFunction<KubejsSkill,HurtedContext, Boolean> onDamaged) {
+        public Builder onDamaged(BiFunction<KubejsSkill,HurtedContext, Float> onDamaged) {
             this.onDamaged = onDamaged;
             return this;
         }

@@ -53,7 +53,7 @@ public class FoodTracker {
             list.addFood(usedItem.getItem());
         });
         ForgeEventListener.syncPlayerFoodList(player);
-    /*打开天赋系统
+    /*打开天赋系统*/
         if (player instanceof ServerPlayer _ent) {
             _ent.stopUsingItem();
             NetworkHooks.openScreen((ServerPlayer) _ent, new MenuProvider() {
@@ -69,7 +69,7 @@ public class FoodTracker {
                 }
             });
         }
-    */
+    /**/
     }
     @SubscribeEvent
     public static void onPlayerAttacked(LivingAttackEvent event) {

@@ -1,6 +1,6 @@
 {
   "soyskill.soycheese_core.enchanted_golden_apple.lock": "未食用过附魔金苹果",
-  "soyskill.soycheese_core.enchanted_golden_apple.unlock": "你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升你感觉到你的额外抗性得到缓慢提升",
+  "soyskill.soycheese_core.enchanted_golden_apple.unlock": "你感觉到你的额外抗性不低于%2$s时，每隔%1$s玩家刻提升%3$s",
   "soyskill.soycheese_core.enchanted_golden_apple2.lock": "未食用过附魔金苹果",
   "soyskill.soycheese_core.enchanted_golden_apple2.unlock": "我对你是否超过我有个小小的疑问",
   "soyskill.soycheese_core.enchanted_golden_apple3.lock": "未食用过附魔金苹果",
