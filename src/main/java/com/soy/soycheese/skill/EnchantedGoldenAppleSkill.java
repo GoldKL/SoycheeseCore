@@ -23,12 +23,12 @@ public class EnchantedGoldenAppleSkill extends BaseSkill {
     @Override
     public void onTick(Player player) {
         if(player.level().isClientSide)return;
-        if(player.tickCount % (int)(this.getSkillArgument("player_tick_interval")) == 0)
+        if(player.tickCount % this.getSkillArgument("player_tick_interval",Integer.class) == 0)
         {
-            if(player.getAbsorptionAmount() < (float)this.getSkillArgument("player_max_absorption_amount"))
+            if(player.getAbsorptionAmount() < this.getSkillArgument("player_max_absorption_amount",Float.class))
             {
-                player.setAbsorptionAmount(Math.min((float)this.getSkillArgument("player_max_absorption_amount")
-                        ,player.getAbsorptionAmount() + (float)this.getSkillArgument("player_add_absorption_amount")));
+                player.setAbsorptionAmount(Math.min(this.getSkillArgument("player_max_absorption_amount",Float.class)
+                        ,player.getAbsorptionAmount() + this.getSkillArgument("player_add_absorption_amount",Float.class)));
             }
         }
     }

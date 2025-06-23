@@ -12,8 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import javax.annotation.Nullable;
 
 import com.soy.soycheese.registries.SkillRegistry;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class BaseSkill {
@@ -47,12 +47,16 @@ public class BaseSkill {
             SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
         }
     }
-    public Object getSkillArgument(String name) {
+    public <T> T getSkillArgument(String name, @NotNull Class<T> type) {
         try {
             if (!skill_arguments.containsKey(name)) {
                 throw new IllegalArgumentException("Skill argument " + name + " not found");
             }
-            return skill_arguments.get(name);
+            Object value = skill_arguments.get(name);
+            if(!type.isInstance(value)) {
+                throw new IllegalArgumentException("Skill argument " + name + " can't be cast to " + type);
+            }
+            return type.cast(value);
         }catch (ClassCastException e) {
             SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
             return null;
