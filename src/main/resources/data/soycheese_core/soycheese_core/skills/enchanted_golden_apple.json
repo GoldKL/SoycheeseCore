@@ -1,0 +1,5 @@
+{
+  "player_tick_interval": 50,
+  "player_max_absorption_amount": 30.0,
+  "player_add_absorption_amount": 1.0
+}

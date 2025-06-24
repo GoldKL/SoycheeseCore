@@ -1,5 +1,6 @@
 package com.soy.soycheese.skill;
 
+import com.google.gson.JsonObject;
 import com.soy.soycheese.SoycheeseCore;
 import net.minecraft.Util;
 
@@ -14,40 +15,52 @@ import javax.annotation.Nullable;
 import com.soy.soycheese.registries.SkillRegistry;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class BaseSkill {
     @Nullable
     private String nameid;
     @Nullable
-    private ResourceLocation icon;
+    private ResourceLocation skillid;
     private final int type;//0 1 2 3 分类
     private final LinkedHashMap<String,Object> skill_arguments;
+    private final HashMap<String,Class<?>> skill_types;
+    private final HashMap<String,Object> skill_defaults;
+    public final static Set<Class<?>> ACCEPT_TYPES = Set.of(Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, BigDecimal.class, BigInteger.class,String.class);
+    public static <T> boolean isAcceptType(T value)
+    {
+        return value != null && ACCEPT_TYPES.contains(value.getClass());
+    }
     public BaseSkill(int type) {
         this.type = type;
         this.skill_arguments = new LinkedHashMap<>();
+        this.skill_types = new HashMap<>();
+        this.skill_defaults = new HashMap<>();
     }
-    public BaseSkill(int type,LinkedHashMap<String,Object> skill_arguments) {
+    public BaseSkill(int type,LinkedHashMap<String,Object> skill_arguments,HashMap<String,Class<?>> skill_types,HashMap<String,Object> skill_defaults) {
         this.type = type;
         this.skill_arguments = skill_arguments;
+        this.skill_types = skill_types;
+        this.skill_defaults = skill_defaults;
     }
     protected BaseSkill(BaseSkill.Builder builder) {
         this(builder.type);
     }
-    protected void initSkillArgument(String name, Object value) {
-        skill_arguments.put(name, value);
-    }
-    public void changeSkillArgument(String name, Object value) {
-        try {
-            if (!skill_arguments.containsKey(name)) {
-                throw new IllegalArgumentException("Skill argument " + name + " not found");
-            }
+    final protected <T> void initSkillArgument(String name, T value) {
+        if(isAcceptType(value)){
             skill_arguments.put(name, value);
-        }catch (ClassCastException e) {
-            SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
+            skill_defaults.put(name, value);
+            skill_types.put(name,value.getClass());
         }
+        else
+            throw new IllegalArgumentException("Couldn't accept argument" + name + "'s type");
     }
-    public <T> T getSkillArgument(String name, @NotNull Class<T> type) {
+    final public <T> T getSkillArgument(String name, @NotNull Class<T> type) {
         try {
             if (!skill_arguments.containsKey(name)) {
                 throw new IllegalArgumentException("Skill argument " + name + " not found");
@@ -62,18 +75,71 @@ public class BaseSkill {
             return null;
         }
     }
+    final public void readjson(JsonObject config)
+    {
+        HashMap<String,Object> temp = new HashMap<>();
+        for(String name : skill_arguments.keySet())
+        {
+            try{
+                if(skill_types.get(name) == Boolean.class)
+                    temp.put(name,config.get(name).getAsBoolean());
+                else if (skill_types.get(name) == Character.class)
+                    temp.put(name,config.get(name).getAsCharacter());
+                else if (skill_types.get(name) == Byte.class)
+                    temp.put(name,config.get(name).getAsByte());
+                else if (skill_types.get(name) == Short.class)
+                    temp.put(name,config.get(name).getAsShort());
+                else if(skill_types.get(name) == Integer.class)
+                    temp.put(name,config.get(name).getAsInt());
+                else if(skill_types.get(name) == Long.class)
+                    temp.put(name,config.get(name).getAsLong());
+                else if (skill_types.get(name) == Float.class)
+                    temp.put(name,config.get(name).getAsFloat());
+                else if(skill_types.get(name) == Double.class)
+                    temp.put(name,config.get(name).getAsDouble());
+                else if (skill_types.get(name) == BigDecimal.class)
+                    temp.put(name,config.get(name).getAsBigDecimal());
+                else if(skill_types.get(name) == BigInteger.class)
+                    temp.put(name,config.get(name).getAsBigInteger());
+                else if ( skill_types.get(name) == String.class)
+                    temp.put(name,config.get(name).getAsString());
+            }
+            catch (ClassCastException e) {
+                SoycheeseCore.LOGGER.error("Couldn't read skill arguments {}",name, e);
+            }
+        }
+        for(String name : skill_arguments.keySet())
+        {
+            Object value = temp.get(name);
+            if(value != null)
+                skill_arguments.put(name,value);
+            else
+                skill_arguments.put(name,skill_defaults.get(name));
+        }
+    }
+    //给kubejs用的
+    final public Object getSkillArgument(String name) {
+        try {
+            if (!skill_arguments.containsKey(name)) {
+                throw new IllegalArgumentException("Skill argument " + name + " not found");
+            }
+            return skill_arguments.get(name);
+        }catch (ClassCastException e) {
+            SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
+            return null;
+        }
+    }
     public String getOrCreateNameid() {
         if (this.nameid == null) {
-            this.nameid = Util.makeDescriptionId("soyskill", SkillRegistry.REGISTRY.get().getKey(this));
+            this.nameid = Util.makeDescriptionId("soyskill", this.getorCreateSkillid());
         }
         return this.nameid;
     }
-    public ResourceLocation getorCreateIcon() {
-        ResourceLocation res = SkillRegistry.REGISTRY.get().getKey(this);
-        if(this.icon == null && res != null) {
-            this.icon = res;
+    public ResourceLocation getorCreateSkillid() {
+        if(this.skillid == null) {
+            this.skillid = SkillRegistry.REGISTRY.get().getKey(this);
         }
-        return this.icon;
+        return this.skillid;
     }
     public Object[] getSkillArguments() {
         return this.skill_arguments.values().toArray();
@@ -98,7 +164,7 @@ public class BaseSkill {
     }
     //获取技能图标
     public ResourceLocation getSkillIconResource() {
-        return new ResourceLocation(this.getorCreateIcon().getNamespace(), "soycheese_core/soyskill_icons/" +this.getorCreateIcon().getPath() + ".png");
+        return new ResourceLocation(this.getorCreateSkillid().getNamespace(), "soycheese_core/soyskill_icons/" +this.getorCreateSkillid().getPath() + ".png");
     }
     //装备时触发，此时技能已被装备
     public void onEquip(Player player){

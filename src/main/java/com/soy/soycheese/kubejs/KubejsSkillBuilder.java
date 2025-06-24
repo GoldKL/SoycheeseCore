@@ -1,5 +1,6 @@
 package com.soy.soycheese.kubejs;
 
+import com.soy.soycheese.skill.BaseSkill;
 import com.soy.soycheese.skill.KubejsSkill;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
@@ -8,6 +9,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -30,10 +33,19 @@ public class KubejsSkillBuilder extends BuilderBase<KubejsSkill> {
     public BiFunction<KubejsSkill, KubejsSkill.HurtContext,Float> onDamage;
     public BiFunction<KubejsSkill, KubejsSkill.HurtedContext,Float> onDamaged;
     public final LinkedHashMap<String,Object> skill_arguments = new LinkedHashMap<>();
+    public final HashMap<String,Class<?>> skill_types = new HashMap<>();
+    public final HashMap<String,Object> skill_defaults = new HashMap<>();
     public int type;
     @Info("Set the skill's argument")
-    public KubejsSkillBuilder initSkillArgument(String name, Object value) {
-        this.skill_arguments.put(name, value);
+    public <T> KubejsSkillBuilder initSkillArgument(String name, T value) {
+        if(BaseSkill.isAcceptType(value))
+        {
+            this.skill_arguments.put(name, value);
+            this.skill_defaults.put(name, value);
+            this.skill_types.put(name,value.getClass());
+        }
+        else
+            throw new IllegalArgumentException("Couldn't accept argument" + name + "'s type");
         return this;
     }
     @Info("Set the skill's type")

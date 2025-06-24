@@ -8,6 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -87,6 +88,8 @@ public class KubejsSkill extends BaseSkill {
     }
     public KubejsSkill(int type,
                        LinkedHashMap<String,Object> skill_arguments,
+                       HashMap<String,Class<?>> skill_types,
+                       HashMap<String,Object> skill_defaults ,
                        BiConsumer<KubejsSkill,Player> onTick,
                        BiConsumer<KubejsSkill,Player> onEquip,
                        BiConsumer<KubejsSkill,Player> onUnequip,
@@ -99,7 +102,7 @@ public class KubejsSkill extends BaseSkill {
                        BiFunction<KubejsSkill,HurtedContext,Float> onHurted,
                        BiFunction<KubejsSkill,HurtContext,Float> onDamage,
                        BiFunction<KubejsSkill,HurtedContext,Float> onDamageed) {
-        super(type,skill_arguments);
+        super(type,skill_arguments,skill_types,skill_defaults);
         this.onTick = onTick;
         this.onEquip = onEquip;
         this.onUnequip = onUnequip;
@@ -114,7 +117,7 @@ public class KubejsSkill extends BaseSkill {
         this.onDamaged = onDamageed;
     }
     public KubejsSkill(KubejsSkillBuilder builder) {
-        this(builder.type,builder.skill_arguments,
+        this(builder.type,builder.skill_arguments,builder.skill_types,builder.skill_defaults,
                 builder.onTick,
                 builder.onEquip,
                 builder.onUnequip,
@@ -129,7 +132,7 @@ public class KubejsSkill extends BaseSkill {
                 builder.onDamaged);
     }
     protected KubejsSkill(KubejsSkill.Builder builder) {
-        this(builder.type,builder.skill_arguments,
+        this(builder.type,builder.skill_arguments,builder.skill_types,builder.skill_defaults,
                 builder.onTick,
                 builder.onEquip,
                 builder.onUnequip,
@@ -241,16 +244,26 @@ public class KubejsSkill extends BaseSkill {
         private BiFunction<KubejsSkill,HurtedContext,Float> onHurted;
         private BiFunction<KubejsSkill,HurtContext,Float> onDamage;
         private BiFunction<KubejsSkill,HurtedContext,Float> onDamaged;
-        final LinkedHashMap<String,Object> skill_arguments = new LinkedHashMap<>();
+        private final LinkedHashMap<String,Object> skill_arguments = new LinkedHashMap<>();
+        private final HashMap<String,Class<?>> skill_types = new HashMap<>();
+        private final HashMap<String,Object>skill_defaults = new HashMap<>();
         int type;
         public Builder(int type)
         {
             this.type = type;
         }
-        public Builder initSkillArgument(String name, Object value) {
-            this.skill_arguments.put(name, value);
+        public <T> Builder initSkillArgument(String name, T value) {
+            if(isAcceptType(value))
+            {
+                this.skill_arguments.put(name, value);
+                this.skill_defaults.put(name, value);
+                this.skill_types.put(name,value.getClass());
+            }
+            else
+                throw new IllegalArgumentException("Couldn't accept argument" + name + "'s type");
             return this;
         }
+
         public Builder onTick(BiConsumer<KubejsSkill,Player> onTick) {
             this.onTick = onTick;
             return this;
