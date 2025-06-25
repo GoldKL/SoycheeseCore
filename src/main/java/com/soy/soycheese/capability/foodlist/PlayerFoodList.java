@@ -1,6 +1,5 @@
 package com.soy.soycheese.capability.foodlist;
 
-import com.soy.soycheese.SoycheeseCore;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
