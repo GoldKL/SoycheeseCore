@@ -28,9 +28,7 @@ public class BaseSkill {
     @Nullable
     private ResourceLocation skillid;
     private final int type;//0 1 2 3 分类
-    private final LinkedHashMap<String,Object> skill_arguments;
-    private final HashMap<String,Class<?>> skill_types;
-    private final HashMap<String,Object> skill_defaults;
+    final SkillArguments skillArguments;
     public final static Set<Class<?>> ACCEPT_TYPES = Set.of(Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, BigDecimal.class, BigInteger.class,String.class);
     public static <T> boolean isAcceptType(T value)
     {
@@ -38,96 +36,32 @@ public class BaseSkill {
     }
     public BaseSkill(int type) {
         this.type = type;
-        this.skill_arguments = new LinkedHashMap<>();
-        this.skill_types = new HashMap<>();
-        this.skill_defaults = new HashMap<>();
+        this.skillArguments = new SkillArguments();
     }
-    public BaseSkill(int type,LinkedHashMap<String,Object> skill_arguments,HashMap<String,Class<?>> skill_types,HashMap<String,Object> skill_defaults) {
+    public BaseSkill(int type,SkillArguments skillArguments) {
         this.type = type;
-        this.skill_arguments = skill_arguments;
-        this.skill_types = skill_types;
-        this.skill_defaults = skill_defaults;
+        this.skillArguments = new SkillArguments(skillArguments);
+    }
+    public BaseSkill(int type,LinkedHashMap<String,Object> skill_arguments,HashMap<String,Class<?>> skill_types) {
+        this.type = type;
+        this.skillArguments = new SkillArguments(skill_arguments,skill_types);
     }
     protected BaseSkill(BaseSkill.Builder builder) {
         this(builder.type);
     }
     final protected <T> void initSkillArgument(String name, T value) {
-        if(isAcceptType(value)){
-            skill_arguments.put(name, value);
-            skill_defaults.put(name, value);
-            skill_types.put(name,value.getClass());
-        }
-        else
-            throw new IllegalArgumentException("Couldn't accept argument" + name + "'s type");
-    }
-    final public <T> T getSkillArgument(String name, @NotNull Class<T> type) {
-        try {
-            if (!skill_arguments.containsKey(name)) {
-                throw new IllegalArgumentException("Skill argument " + name + " not found");
-            }
-            Object value = skill_arguments.get(name);
-            if(!type.isInstance(value)) {
-                throw new IllegalArgumentException("Skill argument " + name + " can't be cast to " + type);
-            }
-            return type.cast(value);
-        }catch (ClassCastException e) {
-            SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
-            return null;
-        }
-    }
-    final public void readjson(JsonObject config)
-    {
-        HashMap<String,Object> temp = new HashMap<>();
-        for(String name : skill_arguments.keySet())
-        {
-            try{
-                if(skill_types.get(name) == Boolean.class)
-                    temp.put(name,config.get(name).getAsBoolean());
-                else if (skill_types.get(name) == Character.class)
-                    temp.put(name,config.get(name).getAsCharacter());
-                else if (skill_types.get(name) == Byte.class)
-                    temp.put(name,config.get(name).getAsByte());
-                else if (skill_types.get(name) == Short.class)
-                    temp.put(name,config.get(name).getAsShort());
-                else if(skill_types.get(name) == Integer.class)
-                    temp.put(name,config.get(name).getAsInt());
-                else if(skill_types.get(name) == Long.class)
-                    temp.put(name,config.get(name).getAsLong());
-                else if (skill_types.get(name) == Float.class)
-                    temp.put(name,config.get(name).getAsFloat());
-                else if(skill_types.get(name) == Double.class)
-                    temp.put(name,config.get(name).getAsDouble());
-                else if (skill_types.get(name) == BigDecimal.class)
-                    temp.put(name,config.get(name).getAsBigDecimal());
-                else if(skill_types.get(name) == BigInteger.class)
-                    temp.put(name,config.get(name).getAsBigInteger());
-                else if ( skill_types.get(name) == String.class)
-                    temp.put(name,config.get(name).getAsString());
-            }
-            catch (ClassCastException e) {
-                SoycheeseCore.LOGGER.error("Couldn't read skill arguments {}",name, e);
-            }
-        }
-        for(String name : skill_arguments.keySet())
-        {
-            Object value = temp.get(name);
-            if(value != null)
-                skill_arguments.put(name,value);
-            else
-                skill_arguments.put(name,skill_defaults.get(name));
-        }
+        skillArguments.initSkillArgument(name,value);
     }
     //给kubejs用的
     final public Object getSkillArgument(String name) {
-        try {
-            if (!skill_arguments.containsKey(name)) {
-                throw new IllegalArgumentException("Skill argument " + name + " not found");
-            }
-            return skill_arguments.get(name);
-        }catch (ClassCastException e) {
-            SoycheeseCore.LOGGER.error("Couldn't get skill argument {}", name, e);
-            return null;
-        }
+        return skillArguments.getSkillArgument(name);
+    }
+    final public <T> T getSkillArgument(String name, @NotNull Class<T> type) {
+        return skillArguments.getSkillArgument(name,type);
+    }
+    final public void readjson(JsonObject config)
+    {
+        skillArguments.readjson(config);
     }
     public String getOrCreateNameid() {
         if (this.nameid == null) {
@@ -142,7 +76,7 @@ public class BaseSkill {
         return this.skillid;
     }
     public Object[] getSkillArguments() {
-        return this.skill_arguments.values().toArray();
+        return this.skillArguments.getSkillArguments();
     }
     //获取该技能描述，一般不用重写
     public Component getDescription(Player player)  {
